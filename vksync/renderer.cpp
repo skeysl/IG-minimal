@@ -21,7 +21,7 @@ std::vector<VkExtensionProperties> enumerate_device_extension_properties(VkPhysi
 }
 
 
-bool extension_supported(const auto & extensions, const char* ext)
+bool extension_supported(const std::vector<VkExtensionProperties> & extensions, const char* ext)
 	{
 		auto ext_it = std::find_if(
 			extensions.begin(),
