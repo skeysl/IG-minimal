@@ -1,0 +1,23 @@
+[requires]
+glfw/3.3.8
+glew/2.2.0
+
+[generators]
+cmake_find_package
+cmake_paths
+CMakeToolchain
+
+[options]
+glfw:shared=True
+
+[imports]
+bin, *.dll -> ./Release # Copies all dll files from packages bin folder to my "bin" folder
+bin, *.dll -> ./Debug # Copies all dll files from packages bin folder to my "bin" folder
+
+
+
+#mkdir build && cd build
+#conan install ..
+#cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+#cmake --build . --config Release
+
