@@ -46,11 +46,12 @@ ADD_EXECUTABLE(vksync
 	triangle_gl.vert.sprv
 	triangle_gl.frag.sprv
 
-	renderer.h
-	renderer.cpp
 	triangle_renderer.h
 	triangle_renderer.cpp
-
+	
+	renderer_vk.h
+	renderer_vk.cpp
+	
 	renderer_gl.h
 	renderer_gl.cpp
 

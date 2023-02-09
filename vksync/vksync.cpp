@@ -10,7 +10,7 @@
 #include <igx/vk/instance.h>
 #include <igx/vk/debug_utils_messenger.h>
 
-#include "renderer.h"
+#include "renderer_vk.h"
 #include "renderer_gl.h"
 #include "renderer_interop.h"
 
