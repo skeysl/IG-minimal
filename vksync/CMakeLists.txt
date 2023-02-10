@@ -27,7 +27,6 @@ function(add_spirv_shader_gl INPUT_FILE)
         )
 endfunction()
 
-FIND_PACKAGE(glfw3 REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(GLEW REQUIRED)
 FIND_PACKAGE(Vulkan REQUIRED)
@@ -72,7 +71,6 @@ TARGET_LINK_LIBRARIES(vksync
 	Vulkan::Vulkan
 	OpenGL::GL
 	GLEW::GLEW
-	glfw
 	igx
 	igui
 )
