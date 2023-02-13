@@ -44,13 +44,13 @@ Classes for opening win32 windows, managing message loop, creating of OpenGL ren
 
 Test application creates three rendering threads (one thread per GPU). Each thread creates one fullscreen window on the selected monitor and renders a rotating triangle. 
 
+## Renderers
+
 There are three renderers implemented in vksync application - Vulkan renderer, OpenGL renderer and renderer using Vulkan/OpenGL interop. For project simplicity active renderer is hardcoded and called from main function.
 
-
-#### Vulkan renderer 
+### Vulkan renderer 
 
 In each thread after the window is created, a logical device is created for the selected GPU. In case of nv_present_barrier extension being supported this feature is enabled when a logical device is created. Later the Vulkan surface is constructed and a swapchain is created. This swapchain is instrued to use present barriers upon construction. Later the actual triangle renderer is created. While rendering common swapchain acquire/present methods are used. Command buffers are recycled via common round robin fashion.
-
 
 Rendering works only when two GPUs are used. 
 
@@ -66,7 +66,7 @@ Without a present barrier it's possible to have an application running. Renderin
 
 
 
-#### OpenGL renderer
+### OpenGL renderer
 
 When render window is being created, render context is created for correct GPU affinity and DC is added to swap group and binded to swap barrier. 
 
@@ -75,7 +75,7 @@ Rendering on all three GPUs works.
 ![PXL_20230210_074723135](https://user-images.githubusercontent.com/7813849/218451151-26a54312-a948-4da8-a296-3cb37faf6c96.jpg)
 
 
-#### Vulkan/OpenGL interop renderer
+### Vulkan/OpenGL interop renderer
 
 In this case Vulkan renderer created for specific GPU renders into texture shared with OpenGL via interop mechanism. OpenGL is used only to present rendered texture via fullscreen window with active swap group/barrier.
 
