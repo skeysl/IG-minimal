@@ -50,7 +50,7 @@ There are three renderers implemented in vksync application - Vulkan renderer, O
 
 ### Vulkan renderer 
 
-In each thread after the window is created, a logical device is created for the selected GPU. In case of nv_present_barrier extension being supported this feature is enabled when a logical device is created. Later the Vulkan surface is constructed and a swapchain is created. This swapchain is instrued to use present barriers upon construction. Later the actual triangle renderer is created. While rendering common swapchain acquire/present methods are used. Command buffers are recycled via common round robin fashion.
+One vulkan instance is created. In each thread after the window is created, a logical device is created for the selected GPU. In case of nv_present_barrier extension being supported this feature is enabled when a logical device is created. Later the Vulkan surface is constructed and a swapchain is created (fifo). This swapchain is instrued to use present barriers upon construction (via VkSwapchainPresentBarrierCreateInfoNV). Later the actual triangle renderer is created. While rendering common swapchain acquire/present methods are used. Command buffers are recycled in common round robin fashion. There is no additional synchronization between those three threads (CPU or GPU).
 
 Rendering works only when two GPUs are used. 
 
@@ -60,11 +60,9 @@ When three GPUs are used application hungs at the startup:
 
 ![PXL_20230210_075105851](https://user-images.githubusercontent.com/7813849/218450897-09e2ccf4-6268-48a9-aff7-b4e2a9bcca49.jpg)
 
-Without a present barrier it's possible to have an application running. Rendering is not fluent. After observing Nsight Systems capture of vksync running there it's visible that vkQueuePresent on any GPU is blocking vkQueueSubmits on other's GPU: 
+Without a present barrier it's possible to have an application running. Rendering is not fluent. After observing Nsight Systems capture of vksync it's visible that vkQueuePresent on any GPU is blocking vkQueueSubmits on other's GPU: 
 
 ![image](https://user-images.githubusercontent.com/7813849/218451970-8b3e80de-0e07-4c83-b043-e26d96e8c5f1.png)
-
-
 
 ### OpenGL renderer
 
@@ -74,12 +72,6 @@ Rendering on all three GPUs works.
 
 ![PXL_20230210_074723135](https://user-images.githubusercontent.com/7813849/218451151-26a54312-a948-4da8-a296-3cb37faf6c96.jpg)
 
-
 ### Vulkan/OpenGL interop renderer
 
-In this case Vulkan renderer created for specific GPU renders into texture shared with OpenGL via interop mechanism. OpenGL is used only to present rendered texture via fullscreen window with active swap group/barrier.
-
-
-
-
-
+In this case Vulkan renderer created for specific GPU renders into texture shared with OpenGL via interop mechanism. OpenGL is used only to present rendered texture via fullscreen window with active swap group/barrier. 
