@@ -10,7 +10,7 @@ Minimal project to reproduce Vulkan present barrier problem.
 * 3x Quadro RTX A5500 + Quadro Sync II
 * Each Quadro RTX card is having one output monitor connected.
 * Display synchronization is enabled via Nvidia Control Panel.
-* Windows 10, driver 528.02
+* Windows 10 (Version 22H2, OS Build 19045.2486), driver 528.02
 
 <img width="75%" alt="Sync" src="https://user-images.githubusercontent.com/7813849/218439066-1b4d8092-58c3-46a4-9330-d74b56aa6297.png">
 
