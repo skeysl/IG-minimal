@@ -2,7 +2,7 @@
 
 #include "../igx_export.h"
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace gl
 {
