@@ -69,7 +69,7 @@ namespace igui::win32
 
 		SetWindowLongPtr(wnd, GWLP_USERDATA, (LONG_PTR)this);
 
-		ShowWindow(wnd, (monitor != -1) ? SW_MAXIMIZE : SW_SHOW);
+		ShowWindow(wnd, monitor ? SW_MAXIMIZE : SW_SHOW);
 		UpdateWindow(wnd);
 	}
 
