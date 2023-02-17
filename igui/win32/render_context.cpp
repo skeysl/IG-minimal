@@ -8,13 +8,12 @@
 
 namespace igui::win32
 {
-	render_context::render_context(window& w)
+	render_context::render_context(window& w) :
+		dc(w.dc),
+		rc(w.rc)
 	{
-		if (!wglMakeCurrent(w.dc, w.rc))
+		if (!wglMakeCurrent(dc, rc))
 		{
-			dc = w.dc;
-			rc = w.rc;
-
 			LPVOID lpMsgBuf;
 			DWORD dw = GetLastError();
 
