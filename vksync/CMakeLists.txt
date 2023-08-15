@@ -48,6 +48,9 @@ ADD_EXECUTABLE(vksync
 	triangle_renderer.h
 	triangle_renderer.cpp
 	
+	vulkan_instance.h
+	vulkan_instance.cpp
+	
 	renderer_vk.h
 	renderer_vk.cpp
 	
