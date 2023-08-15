@@ -22,11 +22,12 @@
 bool debug = false;
 
 unsigned width = 1920;//2560;
-unsigned height = 1080;//1600;
+unsigned height = 1200;//1600;
 unsigned swapchain_lenght = 3;
 VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
 
 unsigned draw_calls_count = 700;//3000;
+
 
 int main_vk()
 {
@@ -62,7 +63,7 @@ int main_vk()
 				igui::win32::window wnd0(width, height, "gpu0", monitor);
 				vk::surface surface0(inst.instance(), wnd0);
 
-				renderer r0(inst.instance(), inst.physical_device(gpu), surface0, width, height, present_mode, swapchain_lenght);
+				renderer r0(inst.instance(), inst.physical_device(gpu), surface0, { width, height }, present_mode, swapchain_lenght);
 
 				while (running)
 				{
@@ -82,6 +83,72 @@ int main_vk()
 		std::jthread r2_thread(renderer_fn, 0, 0);
 		std::jthread r0_thread(renderer_fn, 1, 1);
 		std::jthread r1_thread(renderer_fn, 2, 2);
+	}
+	catch (std::exception& e)
+	{
+		IGLOG_ERROR(e.what());
+	}
+
+	return 0;
+}
+
+
+int main_vk_multimonitor()
+{
+	try
+	{
+		igui::win32::application app;
+
+		std::vector<const char*> instance_extensions;
+
+		if (debug)
+		{
+			instance_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
+
+		instance_extensions.push_back(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME);
+
+		app.for_each_required_instance_extension([&](const char* required_extension)
+			{
+				IGLOG("ui required extension " << required_extension);
+				instance_extensions.push_back(required_extension);
+			});
+
+
+		vulkan_instance inst(instance_extensions, debug);
+
+
+		std::atomic<bool> running = true;
+
+		auto renderer_fn = [&](unsigned monitor0, unsigned monitor1, unsigned gpu)
+		{
+			try
+			{
+				igui::win32::window wnd0(width, height, "gpu0", monitor0);
+				igui::win32::window wnd1(width, height, "gpu0", monitor1);
+				vk::surface surface0(inst.instance(), wnd0);
+				vk::surface surface1(inst.instance(), wnd1);
+
+				renderer r0(inst.instance(), inst.physical_device(gpu), surface0, surface1, { width, height }, present_mode, swapchain_lenght);
+
+				while (running)
+				{
+					if (!app.poll())
+						running = false;
+
+					r0.run(draw_calls_count);
+				}
+
+			}
+			catch (std::exception& e)
+			{
+				IGLOG_ERROR(e.what());
+			}
+		};
+
+		std::jthread r2_thread(renderer_fn, 0, 1, 0);
+		//std::jthread r0_thread(renderer_fn, 1, 1);
+		//std::jthread r1_thread(renderer_fn, 2, 2);
 	}
 	catch (std::exception& e)
 	{
@@ -262,4 +329,6 @@ int main()
 	return main_vk();
 //	return main_gl();
 //	return main_gl_interop();
+
+	//return main_vk_multimonitor();
 }

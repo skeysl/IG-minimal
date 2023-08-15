@@ -16,14 +16,13 @@
 
 #include <ig/timer.h>
 
-#include <Windows.h>
-
 
 class renderer
 {
 public:
 
-	renderer(VkInstance ins, VkPhysicalDevice pd, VkSurfaceKHR surf, unsigned w, unsigned h, VkPresentModeKHR present_mode, unsigned swapchain_length);
+	renderer(VkInstance ins, VkPhysicalDevice pd, VkSurfaceKHR surf, VkExtent2D width_height, VkPresentModeKHR present_mode, unsigned swapchain_length);
+	renderer(VkInstance ins, VkPhysicalDevice pd, VkSurfaceKHR surf0, VkSurfaceKHR surf1, VkExtent2D width_height, VkPresentModeKHR present_mode, unsigned swapchain_length);
 	~renderer();
 
 	void run(unsigned draw_calls_count = 1);
@@ -32,37 +31,50 @@ public:
 
 protected:
 
-	void create_swapchain(VkSurfaceKHR surface, VkSurfaceFormatKHR swapchain_format, unsigned w, unsigned h, 
-		VkPresentModeKHR present_mode, unsigned swapchain_length, VkSurfaceTransformFlagBitsKHR transform, VkBool32 present_barrier_enable);
-	void create_render_pass(VkFormat color_format);
+	vk::render_pass create_render_pass(VkFormat color_format);
 
 	void record(VkCommandBuffer cmdb, VkFramebuffer fb, float t, unsigned draw_calls_count);
 
 	unsigned width;
 	unsigned height;
 
-	VkSurfaceKHR surface;
-	HMONITOR monitor;
-
-	unsigned frame_index = 0;
-
-
 	vk::device dev;
 
 	VkQueue q0;
 
-	vk::swapchain swp;
-	vk::swapchain old_swapchain;
-	
-	std::vector<vk::image_view> swapchain_views;
-			
 	vk::render_pass rp;
-	
-	std::vector<vk::framebuffer> outputs;
 
-	triangle_renderer tr;	
+	triangle_renderer tr;
+
+	struct output
+	{
+		vk::swapchain swp;
+
+		std::vector<vk::image_view> swapchain_views;
+		std::vector<vk::framebuffer> fbos;
+
+		vk::semaphore image_acquired_semaphore;
+
+		uint32_t image_index = 0;
+
+		uint32_t acquire(VkDevice dev)
+		{
+			VkResult err = vkAcquireNextImageKHR(dev, swp, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &image_index);
+			if (err != VK_SUCCESS)
+				throw std::runtime_error("vkAcquireNextImageKHR failed");
+
+			return image_index;
+		}
+
+		VkFramebuffer fbo() const { return fbos[image_index]; }
+	};
+
+	std::vector<output> outputs;
+
+	renderer::output create_swapchain(VkSurfaceKHR surface, VkSurfaceFormatKHR swapchain_format, VkExtent2D width_height,
+		VkPresentModeKHR present_mode, unsigned swapchain_length, VkSurfaceTransformFlagBitsKHR transform, VkBool32 present_barrier_enable);
 	
-	vk::semaphore image_acquired_semaphore;
+			
 	vk::semaphore draw_completed_semaphore;
 	
 	std::vector<vk::command_pool> cmdb_pools;
@@ -73,6 +85,10 @@ protected:
 	ig::high_resolution_timer timer;
 
 private:
-	VkSurfaceFormatKHR swapchain_format;
-	VkSurfaceTransformFlagBitsKHR transform;
+
+	std::vector<VkSemaphore> submit_wait_semaphores;
+	std::vector<VkPipelineStageFlags> submit_wait_stages;
+
+	std::vector<VkSwapchainKHR> present_swapchains;
+	std::vector<uint32_t> present_image_indices;
 };
